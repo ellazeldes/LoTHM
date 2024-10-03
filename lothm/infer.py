@@ -35,7 +35,6 @@ import re
 
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
-print(sys.path)
 
 import torch
 import time

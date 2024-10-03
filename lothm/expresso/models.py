@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from exampless.speech_to_speech_translation.models import (
+from expresso.speech_to_speech_translation.models import (
     DurationCodeGenerator,
     process_duration,
 )

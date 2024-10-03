@@ -40,13 +40,13 @@ AR Language model trained to produce Hubert tokens from text and a Hifi-GAN base
 ```bash
 gdown --folder 1obshsRv7blb-3boef9o2mh6q4ROrEol3
 ```
-### Install Dependencies
+### Install Dependencies with python 3.8
 
 ```bash
 pip install torch torchaudio
 pip install torchmetrics
-pip install omegaconf
 pip install git+https://github.com/lhotse-speech/lhotse
+pip install git+https://github.com/facebookresearch/textlesslib
 pip install librosa
 pip install encodec
 pip install phonemizer
@@ -66,7 +66,7 @@ python infer.py  --lm-checkpoint checkpoint1.pt --vocoder-checkpoint checkpoint2
 
 ### Text
 
-you can concatenate text prompts using `|` or specify a path of a text file spereated by `\n` if writing Hebrew in
+you can concatenate text lines using `|` or specify a path of a text file spereated by `\n` if writing Hebrew in
 terminal is inconvenient.
 
 ```text
@@ -79,7 +79,7 @@ terminal is inconvenient.
 and run
 
 ```
-python infer.py --lm-checkpoint checkpoint1.pt --vocoder-checkpoint checkpoint2.pt --output-dir ./out --text example.txt --audio-prompts sample_speaker.wav --text-prompts ״חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם.״
+python infer.py --lm-checkpoint checkpoint1.pt --vocoder-checkpoint checkpoint2.pt --output-dir ./out --text senteces.txt --audio-prompts sample_speaker.wav --text-prompts ״חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם.״
 ```
 <!-- 
 
