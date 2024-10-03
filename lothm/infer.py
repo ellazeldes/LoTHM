@@ -184,8 +184,9 @@ def main():
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     if isinstance(args.text, str):
         text_lines = args.text.split("|")
-    with open(args.text) as f:
-        text_lines = f.readlines()
+    else:
+        with open(args.text) as f:
+            text_lines = f.readlines()
 
     data = []
     for idx, line in enumerate(text_lines):
