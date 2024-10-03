@@ -51,6 +51,10 @@ pip install librosa
 pip install encodec
 pip install phonemizer
 pip install matplotlib
+pip install fairseq
+pip install git+https://github.com/facebookresearch/textlesslib/tree/main
+pip install speechbrain
+pip install transformers
 
 ```
 
