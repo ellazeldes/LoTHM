@@ -11,7 +11,7 @@
 
 </p>
 
-![](imgs/model.jpg)
+![](images/image.png)
 
 ___
 <!-- **Abstract:** We tackle the task of text-to-speech (TTS) in Hebrew. Traditional Hebrew contains Diacritics (`Niqqud'),
