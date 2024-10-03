@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from icefall import make_pad_mask
+from valle.utils.icefall import make_pad_mask
 
 from .symbol_table import SymbolTable
 

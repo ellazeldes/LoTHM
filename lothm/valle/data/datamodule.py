@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import torch
-from icefall.utils import str2bool
 from lhotse import CutSet, load_manifest_lazy
 
 from lhotse.dataset import (
@@ -104,7 +103,6 @@ class TtsDataModule:
         )
         group.add_argument(
             "--bucketing-sampler",
-            type=str2bool,
             default=True,
             help="When enabled, the batches will come from buckets of "
             "similar duration (saves padding frames).",
@@ -118,7 +116,6 @@ class TtsDataModule:
         )
         group.add_argument(
             "--concatenate-cuts",
-            type=str2bool,
             default=False,
             help="When enabled, utterances (cuts) will be concatenated "
             "to minimize the amount of padding.",
@@ -140,7 +137,6 @@ class TtsDataModule:
         )
         group.add_argument(
             "--on-the-fly-feats",
-            type=str2bool,
             default=False,
             help="When enabled, use on-the-fly cut mixing and feature "
             "extraction. Will drop existing precomputed feature manifests "
@@ -148,7 +144,6 @@ class TtsDataModule:
         )
         group.add_argument(
             "--shuffle",
-            type=str2bool,
             default=True,
             help="When enabled (=default), the examples will be "
             "shuffled for each epoch.",
@@ -171,13 +166,11 @@ class TtsDataModule:
         )
         group.add_argument(
             "--drop-last",
-            type=str2bool,
             default=False,
             help="Whether to drop last batch. Used by sampler.",
         )
         group.add_argument(
             "--return-cuts",
-            type=str2bool,
             default=True,
             help="When enabled, each batch will have the "
             "field: batch['supervisions']['cut'] with the cuts that "
@@ -194,7 +187,6 @@ class TtsDataModule:
 
         group.add_argument(
             "--enable-spec-aug",
-            type=str2bool,
             default=False,
             help="When enabled, use SpecAugment for training dataset.",
         )

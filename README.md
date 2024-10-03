@@ -50,6 +50,8 @@ pip install git+https://github.com/facebookresearch/textlesslib
 pip install librosa
 pip install encodec
 pip install phonemizer
+pip install matplotlib
+
 ```
 
 ## Inference

@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 import torch
-from icefall.utils import AttributeDict
+from utils import AttributeDict
 
 from valle.models import NUM_MEL_BINS, get_model
 

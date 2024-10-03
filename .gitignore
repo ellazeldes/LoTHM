@@ -1,1 +1,4 @@
 *.pyc
+pretrained_models/*
+out/*
+hebrew_models/*

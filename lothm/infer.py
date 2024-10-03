@@ -174,7 +174,7 @@ def main():
     device = torch.device("cpu")
     if torch.cuda.is_available():
         device = torch.device("cuda", 0)
-    model, text_tokens = load_model(args.checkpoint, device)
+    model, text_tokens = load_model(args.lm_checkpoint, device)
     text_tokens = "lothm/tokenizer/unique_words_tokens_all.k2symbols"
     text_collater = get_text_token_collater(text_tokens)
 
@@ -182,9 +182,10 @@ def main():
     audio_tokenizer = AudioTokenizer()
    
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-   
+    if isinstance(args.text, str):
+        text_lines = args.text.split("|")
     with open(args.text) as f:
-        text_lines = f.redlines()
+        text_lines = f.readlines()
 
     data = []
     for idx, line in enumerate(text_lines):
@@ -210,7 +211,6 @@ def main():
         audio_prompts = tokenize_audio(audio_tokenizer, args.audio_prompts)
         audio_prompts = audio_prompts.to(device)
         # synthesis
-        start = time.time()
         encoded_frames = model.inference(
             text_tokens.to(device),
             text_tokens_lens.to(device),

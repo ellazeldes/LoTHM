@@ -18,7 +18,7 @@ from typing import Any, Dict, List, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from utils.icefall import make_pad_mask
+from valle.utils.icefall import make_pad_mask
 from torchmetrics.classification import BinaryAccuracy
 
 from valle.models.valle import Transpose

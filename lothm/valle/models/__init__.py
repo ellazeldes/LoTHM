@@ -1,7 +1,7 @@
 import argparse
 
 import torch.nn as nn
-from icefall.utils import AttributeDict, str2bool
+from utils import AttributeDict
 
 from .macros import (
     NUM_AUDIO_TOKENS,
@@ -48,13 +48,11 @@ def add_model_arguments(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "--norm-first",
-        type=str2bool,
         default=True,
         help="Pre or Post Normalization.",
     )
     parser.add_argument(
         "--add-prenet",
-        type=str2bool,
         default=False,
         help="Whether add PreNet after Inputs.",
     )
@@ -69,13 +67,11 @@ def add_model_arguments(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "--share-embedding",
-        type=str2bool,
         default=True,
         help="Share the parameters of the output projection layer with the parameters of the acoustic embedding.",
     )
     parser.add_argument(
         "--prepend-bos",
-        type=str2bool,
         default=False,
         help="Whether prepend <BOS> to the acoustic tokens -> AR Decoder inputs.",
     )
@@ -96,7 +92,6 @@ def add_model_arguments(parser: argparse.ArgumentParser):
     # Transformer
     parser.add_argument(
         "--scaling-xformers",
-        type=str2bool,
         default=False,
         help="Apply Reworked Conformer scaling on Transformers.",
     )

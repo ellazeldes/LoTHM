@@ -36,7 +36,7 @@ print(sys.path)
 
 import torch
 import torchaudio
-from icefall.utils import AttributeDict, str2bool
+from utils import AttributeDict, str2bool
 
 from valle.data import (
     AudioTokenizer,

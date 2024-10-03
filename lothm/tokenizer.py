@@ -34,9 +34,9 @@ import os
 import librosa
 from scipy.io.wavfile import write
 
-from expresso.models import MultiSpkrMultiAccentCodeGenerator
-from expresso.inference import load_config
-from expresso.expresso_dataset import InferenceCodeDataset
+from speech_resynthesis.examples.expresso.models import MultiSpkrMultiAccentCodeGenerator
+from speech_resynthesis.examples.expresso.inference import load_config, load_vocoder_meta
+from speech_resynthesis.examples.expresso.expresso_dataset import InferenceCodeDataset
 
 from valle.data.hebrew_root_tokenizer import AlefBERTRootTokenizer
 
@@ -460,18 +460,19 @@ class AudioTokenizer:
     @torch.no_grad()
     def decode(self, input_code_file, output_dir, device, checkpoint) -> torch.Tensor:
         print(f"output_dir={output_dir}")
+        speakers, styles = load_vocoder_meta(checkpoint)
         h = load_config(checkpoint)
         dataset = InferenceCodeDataset(
             input_code_file=input_code_file,
             name_parts=False,
             sampling_rate=16000,
             multispkr=h.get("multispkr", None),
-            speakers=None,
+            speakers=speakers,
             forced_speaker=None,
             random_speaker=None,
             random_speaker_subset=None,
             multistyle=h.get("multistyle", None),
-            styles=None,
+            styles=styles,
             forced_style=None,
             random_style=True,
             random_style_subset=None,
@@ -485,7 +486,7 @@ class AudioTokenizer:
         generator.remove_weight_norm()
         
         for idx, d in enumerate(dataset):
-            code, gt_audio, _, _ = dataset[0]
+            code, gt_audio, _, _ = d
             code = {k: torch.from_numpy(v).to(device).unsqueeze(0) for k, v in code.items()}
 
             new_code = dict(code)
