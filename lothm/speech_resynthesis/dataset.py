@@ -224,7 +224,7 @@ class CodeDataset(torch.utils.data.Dataset):
                 deduplicate=False,
                 need_f0=False,
                 checkpoint_path=self.km_checkpoint_path
-            ).cuda()
+            ).to(device)
 
         if f0_stats:
             self.f0_stats = torch.load(f0_stats)
@@ -289,7 +289,7 @@ class CodeDataset(torch.utils.data.Dataset):
 
         # Trim audio ending
         if self.on_the_fly:
-                encoded = self.encoder(torch.from_numpy(audio).cuda())
+                encoded = self.encoder(torch.from_numpy(audio).to(self.device))
                 code = encoded["units"].cpu().detach().numpy()
         if self.vqvae:
             code_length = audio.shape[0] // self.code_hop_size

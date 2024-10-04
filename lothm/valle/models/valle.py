@@ -980,6 +980,7 @@ class VALLE(VALLF):
         repetition_threshold: float,
         top_k: int = -100,
         temperature: float = 1.0,
+        device="cuda"
     ) -> torch.Tensor:
         """
         Args:
@@ -1023,7 +1024,7 @@ class VALLE(VALLF):
         x_len = x_lens.max()
         x_attn_mask = torch.zeros((x_len, x_len), dtype=torch.bool)
         preceding_sequence = torch.empty((1, 0), dtype=torch.int64)
-        preceding_sequence = preceding_sequence.to("cuda")
+        preceding_sequence = preceding_sequence.to(device)
         while True:
             y_emb = self.ar_audio_embedding(y)
             y_emb = self.ar_audio_prenet(y_emb)

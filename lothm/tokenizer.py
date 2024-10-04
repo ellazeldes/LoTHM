@@ -452,7 +452,7 @@ class AudioTokenizer:
         return self._device
 
     def encode(self, wav: torch.Tensor) -> torch.Tensor:
-        encoded = self.encoder(wav.cuda())
+        encoded = self.encoder(wav.to(self.device))
         res = encoded["units"]
       
         return res

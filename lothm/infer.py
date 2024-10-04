@@ -222,6 +222,7 @@ def main():
             repetition_threshold=args.repetition_threshold,
             top_k=args.top_k,
             temperature=args.temperature,
+            device=device
         )
 
         l =list(encoded_frames.squeeze().cpu().numpy())
