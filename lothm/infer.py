@@ -169,13 +169,13 @@ def remove_paranthesis(input_string):
 def main():
     args = get_args()
     print(args)
-    text_tokenizer = AlefBERTRootTokenizer(vocab_file="lothm/tokenizer/vocab.txt")
+    text_tokenizer = AlefBERTRootTokenizer(vocab_file=f"{os.path.dirname(os.path.abspath(__file__))}/tokenizer/vocab.txt")
 
     device = torch.device("cpu")
     if torch.cuda.is_available():
         device = torch.device("cuda", 0)
     model, text_tokens = load_model(args.lm_checkpoint, device)
-    text_tokens = "lothm/tokenizer/unique_words_tokens_all.k2symbols"
+    text_tokens = f"{os.path.dirname(os.path.abspath(__file__))}/tokenizer/unique_words_tokens_all.k2symbols"
     text_collater = get_text_token_collater(text_tokens)
 
     print("using hubert to encode audio prompt")
