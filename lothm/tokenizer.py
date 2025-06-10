@@ -458,7 +458,7 @@ class AudioTokenizer:
         return res
     
     @torch.no_grad()
-    def decode(self, input_code_file, output_dir, device, checkpoint) -> torch.Tensor:
+    def decode(self, input_code_file, output_dir, device, checkpoint, filename=None) -> torch.Tensor:
         print(f"output_dir={output_dir}")
         speakers, styles = load_vocoder_meta(checkpoint)
         h = load_config(checkpoint)
@@ -499,7 +499,11 @@ class AudioTokenizer:
             audio = audio * MAX_WAV_VALUE
             audio = audio.cpu().numpy().astype('int16')
             os.makedirs(output_dir, exist_ok=True)
-            output_file = os.path.join(output_dir, "sample" + str(idx) + ".wav")
+            if filename:
+                fname = filename
+            else:
+                fname = f"sample{idx}.wav"
+            output_file = os.path.join(output_dir, fname)
             audio = librosa.util.normalize(audio.astype(np.float32))
             write(output_file, 16000, audio)
     
