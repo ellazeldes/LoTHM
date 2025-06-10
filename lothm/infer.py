@@ -31,6 +31,7 @@ import sys
 from pathlib import Path
 import json
 import re
+import pandas as pd
 
 
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
@@ -51,6 +52,13 @@ from valle.data.hebrew_root_tokenizer import AlefBERTRootTokenizer
 
 def get_args():
     parser = argparse.ArgumentParser()
+    
+    parser.add_argument(
+        "--csv_path",
+        type=str,
+        default=None,
+        help="Optional: Path to CSV file with columns: filename|text|prompt|audio_prompt",
+    )
 
     parser.add_argument(
         "--text-prompts",
@@ -165,6 +173,30 @@ def remove_paranthesis(input_string):
     # Substitute the matched patterns (parentheses) with an empty string
     return pattern.sub('', input_string)
             
+            
+def synthesize_line(prompt, line, audio_prompt_path, model, text_tokenizer, text_collater, audio_tokenizer, device, args):
+    text_tokens, text_tokens_lens = text_collater([
+        text_tokenizer._tokenize(f"{prompt} {line}".strip().replace(" ", "_"))
+    ])
+    _, enroll_x_lens = text_collater([
+        text_tokenizer._tokenize(prompt.strip())
+    ])
+    audio_prompts = tokenize_audio(audio_tokenizer, audio_prompt_path)
+    audio_prompts = audio_prompts.to(device)
+    encoded_frames = model.inference(
+        text_tokens.to(device),
+        text_tokens_lens.to(device),
+        audio_prompts.unsqueeze(0).unsqueeze(-1),
+        enroll_x_lens=enroll_x_lens,
+        window_size=args.window_size,
+        top_p_value=args.top_p,
+        repetition_threshold=args.repetition_threshold,
+        top_k=args.top_k,
+        temperature=args.temperature,
+        device=device
+    )
+    return encoded_frames.squeeze().cpu().numpy()
+            
 @torch.no_grad()
 def main():
     args = get_args()
@@ -182,6 +214,7 @@ def main():
     audio_tokenizer = AudioTokenizer()
    
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
+        
     if isinstance(args.text, str):
         text_lines = args.text.split("|")
     else:
@@ -189,63 +222,66 @@ def main():
             text_lines = f.readlines()
 
     data = []
-    for idx, line in enumerate(text_lines):
-        line = remove_niqqud_from_string(line)
-        if has_english_chars(line):
-            continue
-        logging.info(f"synthesize text: {line}")
-        text_tokens, text_tokens_lens = text_collater(
-            [
-                text_tokenizer._tokenize(
-                    f"{args.text_prompts} {line}".strip().replace(" ", "_")
-                )
-            ]
-        )
-        _, enroll_x_lens = text_collater(
-            [
-                text_tokenizer._tokenize(
-                    f"{args.text_prompts}".strip()
-                )
-            ]
-        )
+    if args.csv_path:
+        # Use CSV mode: read all data from CSV file
+        df = pd.read_csv(args.csv_path, sep=",")
 
-        audio_prompts = tokenize_audio(audio_tokenizer, args.audio_prompts)
-        audio_prompts = audio_prompts.to(device)
-        # synthesis
-        encoded_frames = model.inference(
-            text_tokens.to(device),
-            text_tokens_lens.to(device),
-            audio_prompts.unsqueeze(0).unsqueeze(-1),
-            enroll_x_lens=enroll_x_lens,
-            window_size=args.window_size,
-            top_p_value=args.top_p,
-            repetition_threshold=args.repetition_threshold,
-            top_k=args.top_k,
-            temperature=args.temperature,
-            device=device
+        for idx, row in df.iterrows():
+            filename = row['filename']
+            line = remove_niqqud_from_string(str(row['text']))
+            if has_english_chars(line):
+                logging.info(f"Skipping line with English chars: {line}")
+                continue
+
+            prompt = str(row['prompt']).strip()
+            audio_prompt_path = str(row['audio_prompt']).strip()
+
+            logging.info(f"Synthesizing text: {line} with prompt: {prompt} and audio prompt: {audio_prompt_path}")
+
+            hubert_array = synthesize_line(prompt, line, audio_prompt_path, model, text_tokenizer, text_collater, audio_tokenizer, device, args)
+            hubert_str = " ".join([str(c) for c in hubert_array])
+
+            tmp_file = os.path.join(args.output_dir, f"{filename}_input_code.txt")
+            with open(tmp_file, "w") as f:
+                f.write(str({'audio': audio_prompt_path, 'hubert': hubert_str}) + "\n")
+
+            filename = str(row['filename'])
+            audio_tokenizer.decode(
+                tmp_file,
+                output_dir=args.output_dir,
+                device=device,
+                checkpoint=args.vocoder_checkpoint,
+                filename=filename
+            )
+    else:
+        for idx, line in enumerate(text_lines):
+            line = remove_niqqud_from_string(line)
+            if has_english_chars(line):
+                continue
+            logging.info(f"synthesize text: {line}")
+
+            hubert_array = synthesize_line(args.text_prompts, line, args.audio_prompts, model, text_tokenizer, text_collater, audio_tokenizer, device, args)
+            hubert_str = " ".join([str(c) for c in hubert_array])
+            data.append({
+                'audio': args.audio_prompts,
+                'hubert': hubert_str
+            })
+        
+        tmp_file = os.path.join(args.output_dir, "tmp_input_code.txt")
+        with open(tmp_file, "w") as f:
+            for dictionary in data:
+            # Write each dictionary on a new line
+                f.write(f"{dictionary}\n")
+
+                    
+        
+        audio_tokenizer.decode(
+            tmp_file, 
+            output_dir=args.output_dir,
+            device=device,
+            checkpoint=args.vocoder_checkpoint
         )
-
-        l =list(encoded_frames.squeeze().cpu().numpy())
-        data.append({
-            'audio': args.audio_prompts,
-            'hubert': " ".join([str(c) for c in l])
-        })
-    
-    tmp_file = os.path.join(args.output_dir, "tmp_input_code.txt")
-    with open(tmp_file, "w") as f:
-        for dictionary in data:
-        # Write each dictionary on a new line
-            f.write(f"{dictionary}\n")
-
                 
-    
-    audio_tokenizer.decode(
-        tmp_file, 
-        output_dir=args.output_dir,
-        device=device,
-        checkpoint=args.vocoder_checkpoint
-    )
-            
         
 
 torch.set_num_threads(1)

@@ -1,0 +1,26 @@
+[project]
+name = "lothm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "amfm-decompy>=1.0.12.2",
+    "encodec>=0.1.1",
+    "fairseq>=0.12.2",
+    "gdown>=5.2.0",
+    "lhotse",
+    "librosa>=0.10.0",
+    "matplotlib>=3.8.4",
+    "pandas>=2.0.3",
+    "phonemizer>=3.3.0",
+    "speechbrain>=1.0.3",
+    "torch>=2.7.1",
+    "torchaudio>=2.7.1",
+    "torchmetrics>=1.7.2",
+    "transformers>=4.52.4",
+    "unidecode>=1.4.0",
+]
+
+[tool.uv.sources]
+lhotse = { git = "https://github.com/lhotse-speech/lhotse" }

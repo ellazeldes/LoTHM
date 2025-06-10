@@ -38,24 +38,13 @@ in [google drive](https://drive.google.com/drive/folders/1obshsRv7blb-3boef9o2mh
 AR Language model trained to produce Hubert tokens from text and a Hifi-GAN based decoder to produce wav files. 
 
 ```bash
-gdown --folder 1obshsRv7blb-3boef9o2mh6q4ROrEol3
-```
-### Install Dependencies with python 3.8
-
-```bash
-pip install torch torchaudio
-pip install torchmetrics
-pip install git+https://github.com/lhotse-speech/lhotse
-pip install git+https://github.com/facebookresearch/textlesslib
-pip install librosa
-pip install encodec
-pip install phonemizer
-pip install matplotlib
-pip install fairseq
-pip install git+https://github.com/facebookresearch/textlesslib/tree/main
-pip install speechbrain
-pip install transformers
-
+pip install uv
+uv sync
+# Install textless
+git clone https://github.com/facebookresearch/textlesslib && cd textlesslib && git checkout ba33d6 
+mv textless ../.venv/lib/python3.9/site-packages/ && cd ../
+# Download models
+uv run gdown --folder 1obshsRv7blb-3boef9o2mh6q4ROrEol3
 ```
 
 ## Inference
@@ -65,9 +54,24 @@ You can play with the model with different speakers and text prompts.
 run `infer.py`:
 
 ```
-python infer.py  --lm-checkpoint checkpoint1.pt --vocoder-checkpoint checkpoint2.pt --output-dir ./out --text "אני חושב שאחת הסיבות שאני לוקח את זה נורא נורא קשה" --audio-prompts sample_speaker.wav --text-prompts ״חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם.״
+export TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1
+uv run lothm/infer.py  --lm-checkpoint hebrew_models/hebrew_lm.pt \
+  --vocoder-checkpoint hebrew_models/heb_decoder.pt \
+  --output-dir ./out --text "אני חושב שאחת הסיבות שאני לוקח את זה נורא נורא קשה" \
+  --audio-prompts sample_speaker.wav \
+  --text-prompts "חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם."
 ```
 
+## CSV
+
+You can create multiple samples with csv, see [examples.csv](example.csv)
+
+```console
+uv run lothm/infer.py \
+  --lm-checkpoint hebrew_models/hebrew_lm.pt \
+  --vocoder-checkpoint hebrew_models/heb_decoder.pt \
+  --output-dir ./out --csv_path ./example.csv
+```
 
 
 ### Text
@@ -85,7 +89,13 @@ terminal is inconvenient.
 and run
 
 ```
-python infer.py --lm-checkpoint checkpoint1.pt --vocoder-checkpoint checkpoint2.pt --output-dir ./out --text senteces.txt --audio-prompts sample_speaker.wav --text-prompts ״חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם.״
+uv run python infer.py \
+  --lm-checkpoint checkpoint1.pt \
+  --vocoder-checkpoint checkpoint2.pt \
+  --output-dir ./out \
+  --text senteces.txt \
+  --audio-prompts sample_speaker.wav \
+  --text-prompts "חוץ מזה, העלאה של הריבית יכולה להשפיע על שוק ההון מה שישפיע על הפנסיה שלכם."
 ```
 <!-- 
 
